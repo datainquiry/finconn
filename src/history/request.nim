@@ -10,4 +10,4 @@ proc requestGet*(url: string): Future[string] {.async.} =
       raise newException(Exception, "Invalid response\n" & response.status)
     result = await response.body
   except HttpRequestError as e:
-    raise newException(Exception, "Failed on get request\n" & e.msg)
+    raise newException(IOError, "Failed on get request\n" & e.msg)

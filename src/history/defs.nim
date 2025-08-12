@@ -1,5 +1,3 @@
-import std/math
-
 type
   Ohlcv* = object
     time*: int64
@@ -30,3 +28,11 @@ type
   TimeDelta* = object
     count*: int64
     period*: Period
+
+  OutputFormat* = enum
+    ofJson, ofCsv
+
+  Args* = object
+    request*: HistoryRequest
+    format*: OutputFormat = ofJson
+    rawTime*: bool = false

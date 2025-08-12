@@ -1,15 +1,15 @@
-import std/[uri, strformat, json, asyncdispatch, unittest]
+import std/[uri, strformat, json, asyncdispatch]
 import defs, timeutil, request
 
 const baseUrl = "https://query2.finance.yahoo.com/v8/finance/chart"
 
 proc makeUrl(request: HistoryRequest): string =
   let interval = case request.freq
-    of Sec: "1s"
     of Min: "1m"
     of Hour: "1h"
     of Day: "1d"
-    else: "1d"
+    else:
+      raise newException(ValueError, "YF available only for min, hour, and day time frames")
   let params = @[
     ("interval", interval),
     ("period1", $int(request.start_time / nano_sec)),
@@ -36,30 +36,9 @@ proc parseYFResponse(content: string): History =
   result = history
 
 proc pullHistory*(request: HistoryRequest): Future[History] {.async.} =
-  let url = makeUrl(request)
   try:
+    let url = makeUrl(request)
     let content = await requestGet(url)
     result = parseYFResponse(content)
   except Exception as e:
-    raise newException(Exception, "Unable to pull history\n" & e.msg)
-
-when defined(DEBUG):
-  suite "YF Tests":
-    test "makeUrl":
-      let current_time = getCurrentTime()
-      let request = HistoryRequest(
-        symbol: "IBM",
-        start_time: current_time - TimeDelta(count: 30, period: Day).toNanoSecs,
-        end_time: current_time
-      )
-      let url = makeUrl(request)
-      echo url
-
-    test "pullHistory":
-      let current_time = getCurrentTime()
-      let request = HistoryRequest(
-        symbol: "IBM",
-        start_time: current_time - TimeDelta(count: 30, period: Day).toNanoSecs,
-        end_time: current_time
-      )
-      discard waitFor pullHistory(request)
+    raise newException(IOError, "Unable to pull history\n" & e.msg)

@@ -4,7 +4,10 @@ This a library to pull market data.
 
 At this moment, it is able to pull historical price data from Yahoo Finance.
 
-Usage: finconn [OPTIONS] --symbol:SYMBOL
+```
+Usage:
+
+finconn [OPTIONS] --symbol:SYMBOL
 
 Options:
 
@@ -19,3 +22,4 @@ Options:
 Times should written as: yyyy-mm-dd or yyyy-mm-ddTHH:MM
 
 Valid intervals are: Min, Hour, and Day.
+```
